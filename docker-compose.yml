@@ -1,0 +1,175 @@
+version: "3.4"
+services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    #network_mode: host
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker_storage/config/sabnzbd:/config
+      - /mnt/docker_storage/downloads:/downloads
+      - /mnt/docker_storage/downloads:/incomplete-downloads
+      - /mnt/docker_storage/complete:/data
+    ports:
+      - 8060:8080
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /mnt/docker_storage/config/sonarr:/config
+      - /mnt/docker_storage/complete/tv:/data/tv
+      - /mnt/docker_storage/downloads:/downloads
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /mnt/docker_storage/config/radarr:/config
+      - /mnt/docker_storage/complete/movies:/data/movies
+      - /mnt/docker_storage/downloads:/downloads
+
+  plex-server:
+    container_name: plex-server
+    image: plexinc/pms-docker:latest
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+    network_mode: host
+    volumes:
+      - /mnt/docker_storage/config/plex/db:/config
+        #9.8.23- /mnt/docker_storage/config/plex/transcode:/transcode
+      - /mnt/docker_storage/complete:/data
+      - /dev/shm:/transcode # RAM transocde 
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=022
+    volumes:
+      - /mnt/docker_storage/config/bazarr:/config
+      - /mnt/docker_storage/complete/movies:/data/movies
+      - /mnt/docker_storage/complete/tv:/data/tv
+    
+  nzbhydra2:
+    image: lscr.io/linuxserver/nzbhydra2:latest
+    container_name: nzbhydra2
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}git@github.com:margotcoe/docker.git
+    volumes:
+      - /mnt/docker_storage/config/nzbhydra2:/config
+      - /mnt/docker_storage/downloads:/downloads
+    ports:
+      - 5076:5076
+    restart: unless-stopped
+      
+  ombi:git@github.com:margotcoe/docker.git
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGUID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker_storage/config:/config
+    ports:
+      - 6565:3579
+    restart: unless-stopped
+
+  ngnix:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: ngnix-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'git@github.com:margotcoe/docker.git
+    volumes:
+      - /docker/data:/data
+      - /docker/letsencrypt:/etc/letsencrypt
+
+        #  certbot:
+        #image: certbot/certbot
+        #container_name: certbot
+        #volumes:
+        #- /docker/letsencrypt:/etc/letsencrypt
+        #- /docker/data:/data 
+  
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker_storage/config/readarr:/config
+      - /mnt/books:/books 
+      - /mnt/docker_storage/downloads:/downloads 
+    ports:
+      - 8787:8787
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    security_opt:
+      - seccomp:unconfined 
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PASSWORD= 
+      - CLI_ARGS=
+    volumes:
+      - /mnt/books:/books  
+      - /mnt/docker_storage/downloads:/downloads  
+      - /mnt/docker_storage/config/calibre:/config
+    ports:
+      - 8080:8080
+      - 8181:8181
+      - 8081:8081
+
+    restart: unless-stopped
+
+  bookbounty:
+    image: thewicklowwolf/bookbounty:latest
+    container_name: bookbounty
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker_storage/config/bookbounty:/bookbounty/config
+      - /mnt/docker_storage/downloads/complete/books:/bookbounty/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 5000:5000
+
