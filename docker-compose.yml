@@ -88,7 +88,7 @@ services:
       - 5076:5076
     restart: unless-stopped
       
-  ombi:git@github.com:margotcoe/docker.git
+  ombi:
     image: lscr.io/linuxserver/ombi:latest
     container_name: ombi
     network_mode: host
@@ -109,7 +109,7 @@ services:
     ports:
       - '80:80'
       - '81:81'
-      - '443:443'git@github.com:margotcoe/docker.git
+      - '443:443'
     volumes:
       - /docker/data:/data
       - /docker/letsencrypt:/etc/letsencrypt
